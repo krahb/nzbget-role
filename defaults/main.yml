@@ -1,0 +1,10 @@
+---
+# defaults file for nzb
+nzbget_state: present
+dest_dir: /opt/nzbget
+main_dir: /var/lib/nzbget
+control_port: 6789
+group_name: nzbget
+group_gid: 1001
+user_name: nzbget
+user_uid: 1001

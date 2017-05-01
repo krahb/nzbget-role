@@ -1,0 +1,14 @@
+[Unit]
+Description=nzbget - NZB client
+After=network.target remote-fs.target nss-lookup.target media-share.mount
+ 
+[Service]
+Type=forking
+User={{ user_name }}
+Group={{ group_name }}
+ExecStart={{ dest_dir }}/nzbget --daemon
+ExecStop={{ dest_dir }}/nzbget --quit
+
+ 
+[Install]
+WantedBy=multi-user.target

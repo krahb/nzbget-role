@@ -1,0 +1,100 @@
+---
+- block:
+# tasks file for nzb
+
+  - name: get latest nzbget version
+    local_action: latest_nzbget_version
+    register: result_latest
+  - name: set version variable
+    set_fact:
+      nzbget_version: "{{ result_latest.msg }}"
+  - name: get nzbget {{ nzbget_version }}
+    get_url:
+      url: "https://github.com/nzbget/nzbget/releases/download/v{{ nzbget_version }}/nzbget-{{ nzbget_version }}-bin-linux.run"
+      dest: /tmp
+    register: latest_nzbget
+  - name: nzbget group present
+    group:
+      name: "{{ group_name }}"
+      gid: "{{ group_gid }}"
+      state: present
+      system: true
+  - name: nzbget user present
+    user:
+      name: "{{ user_name }}"
+      uid: "{{ user_uid }}"
+      group: "{{ group_name }}"
+      state: present
+      system: true
+  - name: directories present
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ user_name }}"
+      group: "{{ group_name }}"
+      mode: "0755"
+    with_items:
+      - "{{ dest_dir }}"
+      - "{{ main_dir }}"
+  - name: link to main_dir
+    file:
+      dest: "{{ dest_dir }}/download"
+      src: "{{ main_dir }}"
+      state: link
+  - name: nzbget installed to {{ dest_dir }}
+    command: "bash /tmp/nzbget-{{ nzbget_version }}-bin-linux.run --destdir {{ dest_dir }} --silent"
+    args:
+      creates: "{{ dest_dir }}//nzbget.conf"
+  - name: systemd service file
+    template:
+      src: nzbget.service.j2
+      dest: /etc/systemd/system/nzbget.service
+  - name: update configuration with ControlPort -> {{ control_port }}
+    lineinfile:
+      dest: "{{ dest_dir }}//nzbget.conf"
+      regexp: "^ControlPort="
+      line: "ControlPort={{ control_port }}"
+      owner: "{{ user_name }}"
+      group: "{{ group_name }}"
+      mode: "0660"
+    notify: restart nzbget
+  - name: update configuration with MainDir -> {{ dest_dir }}/download
+    lineinfile:
+      dest: "{{ dest_dir }}//nzbget.conf"
+      regexp: "^MainDir="
+      line: "MainDir={{ dest_dir }}/download"
+      owner: "{{ user_name }}"
+      group: "{{ group_name }}"
+      mode: "0660"
+    notify: restart nzbget
+  - name: generate password
+    set_fact:
+      control_password: "{{ lookup('password', '/dev/null chars=ascii_letters length=8') }}"
+  - name: show password (only if verbosity > 1 or -v)
+    debug:
+      msg: "Generated password: {{ control_password }}"
+      verbosity: 1
+  - name: changing default password to new password (see ControlPassword=)
+    replace:
+      dest: "{{ dest_dir }}//nzbget.conf"
+      regexp: "^ControlPassword=tegbzn6789"
+      replace: "ControlPassword={{ control_password }}"
+      owner: "{{ user_name }}"
+      group: "{{ group_name }}"
+      mode: "0660"
+    notify: restart nzbget
+  - name: nzbget service enabled and started
+    systemd:
+      name: nzbget
+      state: started
+      enabled: true
+      daemon_reload: true
+  - name: firewall port {{ control_port }} open
+    firewalld:
+      port: "{{ control_port }}/tcp"
+      permanent: true
+      state: enabled
+      immediate: true
+
+  tags: nzbget
+...

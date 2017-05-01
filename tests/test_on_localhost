@@ -1,0 +1,18 @@
+TESTDIR=$(basename $0)
+if ! ansible-playbook --syntax-check ${TESTDIR}site.yml >/dev/null
+then
+    echo "failed: syntax errors"
+    exit 1
+fi
+if ! ansible ${TESTDIR}site.yml >/dev/null
+then
+    echo "failed: playbook failures"
+    exit 1
+fi
+if ! ansible ${TESTDIR}site.yml | grep -v 'ok=0' | grep -q 'changed=0'
+then
+    echo "failed: idempotency failed"
+    exit 1
+fi
+echo "succeeded"
+exit 0

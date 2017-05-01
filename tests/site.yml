@@ -1,0 +1,6 @@
+---
+- name: install nzb, transmission and ums
+  hosts: localhost
+  become: yes
+  roles:
+  - ../../nzbget

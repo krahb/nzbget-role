@@ -1,0 +1,7 @@
+---
+# handlers file for nzb
+- name: restart nzbget
+  systemd:
+    name: nzbget
+    state: restarted
+

@@ -1,0 +1,38 @@
+---
+- block:
+# tasks file for nzb
+
+  - name: nzbget stopped and disabled
+    systemd:
+      name: nzbget
+      state: stopped
+      enabled: false
+  - name: "{{ dest_dir }} removed"
+    file:
+      path: "{{ dest_dir }}"
+      state: absent
+  - name: nzbget user absent
+    user:
+      name: "{{ user_name }}"
+      state: absent
+  - name: nzbget group absent
+    group:
+      name: "{{ group_name }}"
+      state: absent
+  - name: systemd service file absent
+    file:
+      path: /etc/systemd/system/nzbget.service
+      state: absent
+  - name: reload systemd
+    systemd:
+      name: nzbget
+      daemon_reload: yes
+  - name: firewall port {{ control_port }} closed
+    firewalld:
+      port: "{{ control_port }}/tcp"
+      permanent: true
+      state: disabled
+      immediate: true
+
+  tags: nzb_absent
+...
