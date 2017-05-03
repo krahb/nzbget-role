@@ -3,9 +3,9 @@ Role Name
 
 Ansible role to install (present) or remove (absent) the latest stable nzbget ( http://nzbget.net ) installation.
 
-I wrote this playbook because it was fun. I use a custom (python) module to get the latest stable version number from the nzbget website, I also use a password lookup to geberate a new password, and added a absent playbook, which removes the installation.
+I wrote this playbook because it was fun. I use a custom (python) module to get the latest stable version number from the nzbget website, I also use a password lookup to geberate a new password, create a stop/start service file in /etc/systemd/system/nzbget.service and added an absent playbook, which removes the installation.
 
-nzbget offers a lot more options and possibilities which are not included in this playbook, the most important obvious is the configuration of a newserver. Open &lt;remote-server&gt;:&lt;control_port&gt; and login with nzbget and the generated password (see below how to find it).
+nzbget offers a lot more options and possibilities which are not included in this playbook, the most important obvious is the configuration of a newserver. Open &lt;remote-server&gt;:&lt;control_port&gt; in your browser and login with nzbget and the generated password (see below how to find it).
 
 
 Requirements
@@ -29,11 +29,13 @@ this is where nzbget is installed
 - main_dir: /var/lib/nzbget
 
 this is where the downloads end up;
-a symbolic link is created to this directory: download -> /var/lib/nzbget
+a symbolic link is created to this directory:
+<code>{{ dest_dir }}/download -> /var/lib/nzbget
+
 might be a good idea to create a filesystem and mount this on /var/lib/nzbget
 - control_port: 6789
 
-this is the nzbget simple webserver is listening, user is nzbget,
+this is where the nzbget simple webserver is listening, user is nzbget,
 the default password is changed (look for ControlPassword in {{ dest_dir }}/nzbget.conf
 or run the playbook with -v, then the password is shown on standard output
 - group_name: nzbget
