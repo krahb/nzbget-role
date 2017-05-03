@@ -30,8 +30,7 @@ this is where nzbget is installed
 
 this is where the downloads end up;
 a symbolic link is created to this directory:
-<code>{{ dest_dir }}/download -> /var/lib/nzbget
-
+<code>{{ dest_dir }}/download -> {{ main_dir}}</code>
 might be a good idea to create a filesystem and mount this on /var/lib/nzbget
 - control_port: 6789
 
