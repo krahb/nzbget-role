@@ -1,7 +1,12 @@
 Role Name
 =========
 
-Ansible role to install (present) or remove (absent) a nzbget ( http://nzbget.net ) installation
+Ansible role to install (present) or remove (absent) the latest stable nzbget ( http://nzbget.net ) installation.
+
+I wrote this playbook because it was fun. I use a custom (python) module to get the latest stable version number from the nzbget website, I also use a password lookup to geberate a new password, and added a absent playbook, which removes the installation.
+
+nzbget offers a lot more options and possibilities which are not included in this playbook, the most important obvious is the configuration of a newserver. Op <remote-server>:<control_port> and login with nzbget and the generated password (see below how to find it).
+
 
 Requirements
 ------------
@@ -16,18 +21,22 @@ Role Variables
 --------------
 
 Default variables
-nzbget_state: present
+- nzbget_state: present
 present means install nzbget, can be overruled on command line, see example
-dest_dir: /opt/nzbget
+- dest_dir: /opt/nzbget
 this is where nzbget is installed
-main_dir: /var/lib/nzbget
+- main_dir: /var/lib/nzbget
 this is where the downloads end up;
-a symbolic link is created: 
-control_port: 6789
-group_name: nzbget
-group_gid: 1001
-user_name: nzbget
-user_uid: 1001
+a symbolic link is created to this directory: download -> /var/lib/nzbget
+might be a good idea to create a filesystem and mount this on /var/lib/nzbget
+- control_port: 6789
+this is the nzbget simple webserver is listening, user is nzbget,
+the default password is changed (look for ControlPassword in {{ dest_dir }}/nzbget.conf
+or run the playbook with -v, then the password is shown on standard output
+- group_name: nzbget
+- group_gid: 1001
+- user_name: nzbget
+- user_uid: 1001
 
 
 Dependencies
