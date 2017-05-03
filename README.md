@@ -6,7 +6,10 @@ Ansible role to install (present) or remove (absent) a nzbget ( http://nzbget.ne
 Requirements
 ------------
 
-OS: Linux with systemd (service file) and internet connection (download latest nzbget)
+OS:
+- Linux with systemd
+- internet connection (download latest nzbget)
+- python[2|3]-requests package installed on the Ansible control machine
 
 
 Role Variables
@@ -14,8 +17,12 @@ Role Variables
 
 Default variables
 nzbget_state: present
+present means install nzbget, can be overruled on command line, see example
 dest_dir: /opt/nzbget
+this is where nzbget is installed
 main_dir: /var/lib/nzbget
+this is where the downloads end up;
+a symbolic link is created: 
 control_port: 6789
 group_name: nzbget
 group_gid: 1001
