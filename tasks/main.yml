@@ -1,1 +1,1 @@
-- include: "{{ nzbget_state }}.yml"
+- include_tasks: "{{ nzbget_state }}.yml"
