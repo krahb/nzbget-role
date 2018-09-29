@@ -51,7 +51,7 @@ def main():
         module.fail_json(msg="Error: http request returned <> 200", rc=1, 
                          err=page_with_latest.status_code)
     
-    latest = re.search('(?<=span class="css-truncate-target">v)(.*?)(?=</span)',
+    latest = re.search('(?<=">v)(.*?)(?=</span)',
                        str(page_with_latest.content))
 
     module.exit_json(msg=latest.group(0), changed=False)
